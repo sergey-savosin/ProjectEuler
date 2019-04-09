@@ -8,7 +8,8 @@ namespace Task007
 {
     class Program
     {
-        public const int N = 1000000;//110000000;
+        //public const int N = 1000000;//110000000;
+        public const int N = 50000000;
 
         static void Main(string[] args)
         {
@@ -24,6 +25,8 @@ namespace Task007
 
             //        for (int i=110000000-90; i<110000001; i++)
             //            p.ShowExpansion(i);
+            long res = p.GetSumOfPrimesNoMoreThan(2000000);
+            Console.WriteLine("sum of 2k primes: {0}", res);
             Console.WriteLine(" < -- press any key -- >");
             Console.ReadLine();
         }

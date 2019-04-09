@@ -125,6 +125,17 @@ public class Primes
         Console.WriteLine("total primes count: {0}", primes.Count);
     }
 
+    public long GetSumOfPrimesNoMoreThan(int N)
+    {
+        long res = 0;
+        foreach (var p in primes)
+        {
+            if (p <= 2000000)
+                res += p;
+        }
+        return res;
+    }
+
     public void ShowDictionaryInt2(SortedDictionary<int, int> d)
     {
         StringBuilder sb = new StringBuilder();
