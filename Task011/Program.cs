@@ -31,7 +31,7 @@ namespace Task011
 20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54
 01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48";
 
-            // parse string into arrays
+            // 1. parse string into arrays
             var res = srcData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             List<List<int>> ar = new List<List<int>>();
             Console.WriteLine($"Len: {res.Length}");
@@ -59,7 +59,7 @@ namespace Task011
             int maxProductIndex = 0;
             List<int> maxProductLine = null;
             
-            // search 4s by lines;
+            // 2. search 4s by lines;
             foreach(List<int> ln in ar)
             {
                 int maxIndexInLine = 0;
@@ -73,7 +73,6 @@ namespace Task011
                 }
             }
 
-            // show result
             Console.WriteLine("1. Search in rows.");
             ShowResultForLine(maxProductLine, maxProductIndex, maxProduct);
 
@@ -81,31 +80,106 @@ namespace Task011
             maxProductIndex = 0;
             maxProductLine = null;
             
-            // search 4s by columns
+            // 3. search 4s by columns
             for(int col = 0; col < ar[0].Count; col++)
             {
                 var ln = new List<int>();
                 for (int row = 0; row < ar.Count; row++)
                 {
                     ln.Add(ar[row][col]);
-                    int maxIndexInLine = 0;
-                    int maxInLine = findMax4ProductInList(ln, out maxIndexInLine);
+                }
 
-                    if (maxInLine > maxProduct)
-                    {
-                        maxProduct = maxInLine;
-                        maxProductIndex = maxIndexInLine;
-                        maxProductLine = ln;
-                    }
+                int maxIndexInLine = 0;
+                int maxInLine = findMax4ProductInList(ln, out maxIndexInLine);
+
+                if (maxInLine > maxProduct)
+                {
+                    maxProduct = maxInLine;
+                    maxProductIndex = maxIndexInLine;
+                    maxProductLine = ln;
                 }
             }
 
             Console.WriteLine("2. Search in columns.");
             ShowResultForLine(maxProductLine, maxProductIndex, maxProduct);
 
-            // search by diagonal from left to right
+            // 4. search by diagonal from left to right
+            maxProduct = 0;
+            maxProductIndex = 0;
+            maxProductLine = null;
+
+            int Ncol = ar[0].Count;
+            int Nrow = ar.Count;
+            for (int startCol = -Ncol + 1; startCol < Ncol; startCol++)
+            {
+                var ln = new List<int>();
+                for (int row = 0; row < Nrow; row++)
+                {
+                    int col = startCol + row;
+                    if (col >=0 && col < Ncol)
+                        ln.Add(ar[row][col]);
+                }
+                // show line
+                Console.Write($"StartCol: {startCol,2}. Line: ");
+                foreach (int num in ln)
+                {
+                    Console.Write($"{num,3}");
+                }
+                Console.WriteLine();
+
+                int maxIndexInLine = 0;
+                int maxInLine = findMax4ProductInList(ln, out maxIndexInLine);
+
+                if (maxInLine > maxProduct)
+                {
+                    maxProduct = maxInLine;
+                    maxProductIndex = maxIndexInLine;
+                    maxProductLine = ln;
+                }
+            }
+
+            Console.WriteLine("3. Search in diagonal from left to right.");
+            ShowResultForLine(maxProductLine, maxProductIndex, maxProduct);
+
+            // 5. search by diagonal from right to left
+            maxProduct = 0;
+            maxProductIndex = 0;
+            maxProductLine = null;
+
+            for (int startCol = 0; startCol < Ncol*2; startCol++)
+            {
+                var ln = new List<int>();
+                for (int row = 0; row<Nrow; row++)
+                {
+                    int col = startCol - row;
+                    if (col >= 0 && col < Ncol)
+                        ln.Add(ar[row][col]);
+                }
+                // show line
+                Console.Write($"StartCol: {startCol,2}. Line: ");
+                foreach (int num in ln)
+                {
+                    Console.Write($"{num,3}");
+                }
+                Console.WriteLine();
+
+                int maxIndexInLine = 0;
+                int maxInLine = findMax4ProductInList(ln, out maxIndexInLine);
+
+                if (maxInLine > maxProduct)
+                {
+                    maxProduct = maxInLine;
+                    maxProductIndex = maxIndexInLine;
+                    maxProductLine = ln;
+                }
+            }
+
+            Console.WriteLine("4. Search in diagonal from right to left.");
+            ShowResultForLine(maxProductLine, maxProductIndex, maxProduct);
 
         }
+
+
 
         /// <summary>
         /// Show result for List
@@ -133,6 +207,7 @@ namespace Task011
             Console.WriteLine($"start index: {productIndex + 1}, product: {product}");
 
         }
+        
         /// <summary>
         /// Поиск произведения из 4-х последовательных чисел в списке
         /// </summary>
