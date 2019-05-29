@@ -9,9 +9,11 @@ namespace Task026
 {
     class Program
     {
+        static int N = 7;
+        static int maxNumOfDigits = 3;
+
         static void Main(string[] args)
         {
-            const int N = 8;
             for (int n=6; n<N; n++)
             {
                 BigInteger rationalPart;
@@ -42,17 +44,28 @@ namespace Task026
                 //}
 
                 BigInteger tens = 1;
-                for (int t = 0; t < maxNines; t++)
+                int wholeDigits = 0;
+                int wholeTens = 1;
+
+                for (int numOfDigits = 0; numOfDigits <= maxNumOfDigits; numOfDigits++)
                 {
-                    Console.Write(">{0} nines:{1}, tens:{2}", n, nines, tens);
-                    if (TestForNine(nines, n, tens, out ratPart))
+                    wholeDigits = GetWholeDigits(n, wholeTens);
+
+                    for (int t = 0; t < maxNines; t++)
                     {
-                        skipTens = t;
+                        Console.Write("[whole: {0}={1}] ", numOfDigits, wholeDigits);
+                        Console.Write(">{0} nines:{1}, tens:{2}", n, nines, tens);
+                        if (TestForNine(nines, n, tens, wholeDigits, out ratPart))
+                        {
+                            skipTens = t;
+                            Console.WriteLine();
+                            return m;
+                        }
                         Console.WriteLine();
-                        return m;
+                        tens = tens * 10;
                     }
-                    Console.WriteLine();
-                    tens = tens * 10;
+
+                    wholeTens *= 10;
                 }
 
 
@@ -63,7 +76,12 @@ namespace Task026
             return -1;
         }
 
-        static bool TestForNine(BigInteger nines, int n, BigInteger skipTens, out BigInteger ratPart)
+        private static int GetWholeDigits(int n, int wholeTens)
+        {
+            return (int)(1.0 * wholeTens / n);
+        }
+
+        static bool TestForNine(BigInteger nines, int n, BigInteger skipTens, int whileDigits, out BigInteger ratPart)
         {
             BigInteger num = skipTens * n;
             Console.Write(" num={0}, div_rest={0}!", num, nines % num);
