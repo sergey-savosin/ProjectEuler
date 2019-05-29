@@ -9,17 +9,20 @@ namespace Task026
 {
     class Program
     {
-        static int N = 7;
-        static int maxNumOfDigits = 3;
+        static int N = 1000;
+        static int maxNumOfDigits = 10;
+        static int maxNines = 1000;
 
         static void Main(string[] args)
         {
-            for (int n=6; n<N; n++)
+            for (int n=2; n<N; n++)
             {
                 BigInteger rationalPart;
-                int skipTens;
-                int ratLength = GetRationalLength(n, out rationalPart, out skipTens);
-                Console.WriteLine("{0}. {1} : {2} skip {3}", n, ratLength, rationalPart, skipTens);
+                int skipWholeDigits, numSkipDigits;
+                int ratLength = GetRationalLength(n, out rationalPart, out skipWholeDigits, out numSkipDigits);
+                Console.WriteLine("{0}. skipWhole: {1}({2}); ratPart: {3}({4})", n,
+                    skipWholeDigits, numSkipDigits,
+                    rationalPart, ratLength);
             }
         }
 
@@ -29,65 +32,61 @@ namespace Task026
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        static int GetRationalLength(int n, out BigInteger ratPart, out int skipTens)
+        static int GetRationalLength(int n, out BigInteger ratPart, out int skipWholeDigits, out int numSkipDigits)
         {
-            const int maxNines = 10;
+            int wholeDigits = 0;
+            BigInteger wholeTens = 1;
             BigInteger nines = 0;
-            for (int m = 1; m < maxNines; m++)
+            for (int numOfDigits = 0; numOfDigits <= maxNumOfDigits; numOfDigits++)
             {
-                nines = nines * 10 + 9;
+                wholeDigits = GetWholeDigits(n, wholeTens);
+                nines = 0;
 
-                //if (TestForTen(nines, n, out ratPart))
-                //{
-                //    skipTens = 0;
-                //    return 0;
-                //}
-
-                BigInteger tens = 1;
-                int wholeDigits = 0;
-                int wholeTens = 1;
-
-                for (int numOfDigits = 0; numOfDigits <= maxNumOfDigits; numOfDigits++)
+                for (int m = 1; m < maxNines; m++)
                 {
-                    wholeDigits = GetWholeDigits(n, wholeTens);
+                    nines = nines * 10 + 9;
 
-                    for (int t = 0; t < maxNines; t++)
+                    if (TestForTen(nines, n, out ratPart))
                     {
-                        Console.Write("[whole: {0}={1}] ", numOfDigits, wholeDigits);
-                        Console.Write(">{0} nines:{1}, tens:{2}", n, nines, tens);
-                        if (TestForNine(nines, n, tens, wholeDigits, out ratPart))
-                        {
-                            skipTens = t;
-                            Console.WriteLine();
-                            return m;
-                        }
-                        Console.WriteLine();
-                        tens = tens * 10;
+                        skipWholeDigits = 0;
+                        numSkipDigits = 0;
+                        return 0;
                     }
 
-                    wholeTens *= 10;
+                    //Console.Write("[whole: {0}={1}] ", numOfDigits, wholeDigits);
+                    //Console.Write(">{0} nines:{1}, tens:{2}", n, nines, wholeTens);
+                    if (TestForNine(nines, n, wholeTens, wholeDigits, out ratPart))
+                    {
+                        //Console.WriteLine();
+                        skipWholeDigits = wholeDigits;
+                        numSkipDigits = numOfDigits;
+                        return m;
+                    }
+                    //Console.WriteLine();
+
                 }
 
-
+                wholeTens = wholeTens * 10;
             }
 
             ratPart = new BigInteger(-1);
-            skipTens = 0;
+            skipWholeDigits = 0;
+            numSkipDigits = 0;
             return -1;
         }
 
-        private static int GetWholeDigits(int n, int wholeTens)
+        private static int GetWholeDigits(int n, BigInteger wholeTens)
         {
-            return (int)(1.0 * wholeTens / n);
+            return (int)(wholeTens / n);
         }
 
-        static bool TestForNine(BigInteger nines, int n, BigInteger skipTens, int whileDigits, out BigInteger ratPart)
+        static bool TestForNine(BigInteger nines, int n, BigInteger wholeTens, int wholeDigits, out BigInteger ratPart)
         {
-            BigInteger num = skipTens * n;
-            Console.Write(" num={0}, div_rest={0}!", num, nines % num);
-            if (nines % num == 0)
+            BigInteger num = nines * (wholeTens - wholeDigits * n);
+            //Console.Write(" num={0}, div_rest={0}!", num, nines % n);
+            if (num % n == 0)
             {
-                ratPart = BigInteger.One * (nines + 1) / num;
+                ratPart = BigInteger.One * num / n;
                 return true;
             }
             ratPart = BigInteger.Zero;
